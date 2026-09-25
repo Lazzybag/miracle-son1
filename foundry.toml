@@ -9,6 +9,6 @@ remappings = [
     "forge-std/=lib/forge-std/src/"
 ]
 
-# Sets up a public network access endpoint for the Sepolia network fork simulation
+# Switched to the official unrestricted public gateway for stable CI/CD runs
 [rpc_endpoints]
-sepolia = "https://ankr.com"
+sepolia = "https://publicnode.com"
