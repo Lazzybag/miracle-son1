@@ -23,19 +23,19 @@ jobs:
         run: forge install foundry-rs/forge-std --no-commit
 
       - name: Run all tests with verbose output
-        run: forge test -vvv
+        run: forge test --fork-url sepolia -vvv
 
       - name: Run message verification tests
-        run: forge test --match-contract MessageVerification -vvv
+        run: forge test --match-contract MessageVerification --fork-url sepolia -vvv
 
       - name: Run sender validation tests
-        run: forge test --match-contract SenderValidation -vvv
+        run: forge test --match-contract SenderValidation --fork-url sepolia -vvv
 
       - name: Run Iris signature analysis tests
-        run: forge test --match-contract IrisSignatureAnalysis -vvv
+        run: forge test --match-contract IrisSignatureAnalysis --fork-url sepolia -vvv
 
       - name: Generate gas report
-        run: forge test -vvv --gas-report > gas-report.txt 2>&1 || true
+        run: forge test --fork-url sepolia -vvv --gas-report > gas-report.txt 2>&1 || true
 
       - name: Upload gas report artifact
         uses: actions/upload-artifact@v4
@@ -84,4 +84,3 @@ jobs:
 
       - name: Build contracts
         run: forge build
-
