@@ -33,7 +33,7 @@ interface ITokenMessenger {
  * @dev Test contract for analyzing Iris payment verification
  */
 contract CCTPDirectMessageTest {
-    // ============ Simple Ownership Logic (Replaces external OpenZeppelin dependency) ============
+    // ============ Simple Ownership Logic ============
     address public owner;
     
     modifier onlyOwner() {
@@ -41,11 +41,11 @@ contract CCTPDirectMessageTest {
         _;
     }
 
-    // ============ Constants ============
+    // ============ Constants (Strict Checksum Casing Fixed) ============
     
     // MessageTransmitterV2 Address (Ethereum & Sepolia)
     IMessageTransmitter public constant messageTransmitter = 
-        IMessageTransmitter(0x0eb340E74b09c2CE87AFCD8b8C156f081432f5c1);
+        IMessageTransmitter(0x0EB340e74b09c2CE87AFCD8b8C156f081432f5c1);
     
     // TokenMessengerV2 Address (Ethereum & Sepolia)
     ITokenMessenger public constant tokenMessenger = 
@@ -84,10 +84,6 @@ contract CCTPDirectMessageTest {
     
     // ============ Test Functions ============
     
-    /**
-     * @dev Test 1: Send arbitrary message directly through MessageTransmitter
-     * Research: Does Iris sign messages sent directly to MessageTransmitter?
-     */
     function test_sendArbitraryMessage(
         uint32 destinationDomain,
         bytes32 recipientAddress,
@@ -119,19 +115,15 @@ contract CCTPDirectMessageTest {
         return nonce;
     }
     
-    /**
-     * @dev Test 2: Send fake USDC deposit message bypassing TokenMessenger
-     * Research: Can we send unauthorized token transfer messages?
-     */
     function test_sendFakeUSDCDeposit(
         uint32 destinationDomain,
         bytes32 recipientAddress,
         uint256 fakeAmount
     ) external onlyOwner returns (uint64 nonce) {
         bytes memory fakeDepositMessage = abi.encode(
-            usdc,                // token address
-            fakeAmount,          // amount (unauthorized)
-            recipientAddress     // mint recipient
+            usdc,                
+            fakeAmount,          
+            recipientAddress     
         );
         
         nonce = messageTransmitter.sendMessage(
@@ -158,16 +150,12 @@ contract CCTPDirectMessageTest {
         return nonce;
     }
     
-    /**
-     * @dev Test 3: Send malformed message to test validation
-     * Research: What is the minimum validation Iris performs?
-     */
     function test_sendMalformedMessage(
         uint32 destinationDomain,
         bytes32 recipientAddress
     ) external onlyOwner returns (uint64 nonce) {
         bytes memory malformedMessage = abi.encodePacked(
-            uint8(0),  // minimal header
+            uint8(0),  
             recipientAddress
         );
         
@@ -195,9 +183,6 @@ contract CCTPDirectMessageTest {
         return nonce;
     }
     
-    /**
-     * @dev Test 4: Normal flow through TokenMessenger (for comparison)
-     */
     function test_sendNormalDeposit(
         uint256 amount,
         uint32 destinationDomain,
@@ -219,9 +204,6 @@ contract CCTPDirectMessageTest {
         return 0;
     }
     
-    /**
-     * @dev Test 5: Send messages with varying payload sizes
-     */
     function test_sendVaryingSizeMessages(
         uint32 destinationDomain,
         bytes32 recipientAddress,
@@ -260,14 +242,11 @@ contract CCTPDirectMessageTest {
     
     // ============ Helper Functions ============
     
-    /**
-     * @dev Get the next available nonce from MessageTransmitter
-     */
     function getNextNonce() external view returns (uint64) {
         try messageTransmitter.getNextAvailableNonce() returns (uint64 nextNonce) {
             return nextNonce;
         } catch {
-            return 0; // Fallback fallback for pure local non-fork simulations
+            return 0; 
         }
     }
 }
