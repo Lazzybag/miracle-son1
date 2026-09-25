@@ -9,6 +9,6 @@ remappings = [
     "forge-std/=lib/forge-std/src/"
 ]
 
-# Switched to the official unrestricted public gateway for stable CI/CD runs
+# Use Alchemy's high-uptime public gateway for Sepolia
 [rpc_endpoints]
-sepolia = "https://publicnode.com"
+sepolia = "https://alchemy.com"
