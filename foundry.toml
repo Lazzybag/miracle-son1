@@ -1,0 +1,10 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc_version = "0.8.20"
+
+# Re-mapping to ensure forge-std routes smoothly inside GitHub Actions
+remappings = [
+    "forge-std/=lib/forge-std/src/"
+]
