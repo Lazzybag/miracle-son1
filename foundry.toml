@@ -8,3 +8,7 @@ solc_version = "0.8.20"
 remappings = [
     "forge-std/=lib/forge-std/src/"
 ]
+
+# Sets up a public network access endpoint for the Sepolia network fork simulation
+[rpc_endpoints]
+sepolia = "https://ankr.com"
