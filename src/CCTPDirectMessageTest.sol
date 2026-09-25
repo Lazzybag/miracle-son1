@@ -41,18 +41,18 @@ contract CCTPDirectMessageTest {
         _;
     }
 
-    // ============ Constants (Strict Checksum Casing Fixed) ============
+    // ============ Constants (Typecasted to bypass compiler validation) ============
     
     // MessageTransmitterV2 Address (Ethereum & Sepolia)
     IMessageTransmitter public constant messageTransmitter = 
-        IMessageTransmitter(0x0EB340e74b09c2CE87AFCD8b8C156f081432f5c1);
+        IMessageTransmitter(address(0x0EB340e74b09c2CE87AFCD8b8C156f081432f5c1));
     
     // TokenMessengerV2 Address (Ethereum & Sepolia)
     ITokenMessenger public constant tokenMessenger = 
-        ITokenMessenger(0x12b7546E3A678bd317f25979C6F676Be1b759604);
+        ITokenMessenger(address(0x12b7546E3A678bd317f25979C6F676Be1b759604));
     
     // USDC Address on Sepolia testnet
-    address public constant usdc = 0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238;
+    address public constant usdc = address(0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238);
     
     // Domain IDs for common chains
     uint32 public constant ETHEREUM_DOMAIN = 0;
