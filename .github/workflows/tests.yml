@@ -1,0 +1,87 @@
+name: Iris Research Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Install dependencies
+        run: forge install foundry-rs/forge-std --no-commit
+
+      - name: Run all tests with verbose output
+        run: forge test -vvv
+
+      - name: Run message verification tests
+        run: forge test --match-contract MessageVerification -vvv
+
+      - name: Run sender validation tests
+        run: forge test --match-contract SenderValidation -vvv
+
+      - name: Run Iris signature analysis tests
+        run: forge test --match-contract IrisSignatureAnalysis -vvv
+
+      - name: Generate gas report
+        run: forge test -vvv --gas-report > gas-report.txt 2>&1 || true
+
+      - name: Upload gas report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gas-report
+          path: gas-report.txt
+          if-no-files-found: ignore
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Install dependencies
+        run: forge install foundry-rs/forge-std --no-commit
+
+      - name: Generate coverage report
+        run: forge coverage --report lcov > coverage.txt 2>&1 || true
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.txt
+          if-no-files-found: ignore
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Install dependencies
+        run: forge install foundry-rs/forge-std --no-commit
+
+      - name: Build contracts
+        run: forge build
+
