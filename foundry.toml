@@ -9,6 +9,6 @@ remappings = [
     "forge-std/=lib/forge-std/src/"
 ]
 
-# Use Alchemy's high-uptime public gateway for Sepolia
+# Using your newly generated Sepolia authenticated API key
 [rpc_endpoints]
-sepolia = "https://alchemy.com"
+sepolia = "https://eth-sepolia.g.alchemy.com/v2/alch_zgx5g7ieYcNBprQeKp1Kc"
