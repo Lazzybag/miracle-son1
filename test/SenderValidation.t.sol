@@ -11,21 +11,21 @@ import "../src/CCTPDirectMessageTest.sol";
 contract SenderValidation is Test {
     CCTPDirectMessageTest public testContract;
     CCTPDirectMessageTest public secondContract;
-    
+
     address constant UNAUTHORIZED_SENDER = 0x1234567890123456789012345678901234567890;
     uint32 constant SEPOLIA_DOMAIN = 0;
     bytes32 constant TEST_RECIPIENT = bytes32(uint256(0xabcd));
-    
+
     function setUp() public {
         testContract = new CCTPDirectMessageTest();
         secondContract = new CCTPDirectMessageTest();
     }
-    
+
     function test_messageFromOwner() public {
         bytes memory message = abi.encode(uint256(100), "authorized");
-        
-        vm.prank(address(this)); 
-        try testContract.test_sendArbitraryMessage(
+
+        vm.prank(address(this));
+        try testContract.sendArbitraryMessage(
             SEPOLIA_DOMAIN,
             TEST_RECIPIENT,
             message
@@ -36,12 +36,12 @@ contract SenderValidation is Test {
             revert("Owner message should be accepted");
         }
     }
-    
+
     function test_messageFromUnauthorizedSender() public {
         bytes memory message = abi.encode(uint256(200), "unauthorized");
-        
+
         vm.prank(UNAUTHORIZED_SENDER);
-        try testContract.test_sendArbitraryMessage(
+        try testContract.sendArbitraryMessage(
             SEPOLIA_DOMAIN,
             TEST_RECIPIENT,
             message
@@ -51,11 +51,11 @@ contract SenderValidation is Test {
             console.log("Unauthorized sender correctly rejected:", reason);
         }
     }
-    
+
     function test_differentContractInstancesSameSender() public {
         bytes memory message = abi.encode(uint256(300), "multi-instance");
-        
-        try testContract.test_sendArbitraryMessage(
+
+        try testContract.sendArbitraryMessage(
             SEPOLIA_DOMAIN,
             TEST_RECIPIENT,
             message
@@ -65,15 +65,15 @@ contract SenderValidation is Test {
             revert("First contract message should be accepted");
         }
     }
-    
+
     function test_identicalMessageDifferentSenders() public {
         bytes memory identicalMessage = abi.encode(
             address(0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238),
             uint256(1000e6),
             TEST_RECIPIENT
         );
-        
-        try testContract.test_sendArbitraryMessage(
+
+        try testContract.sendArbitraryMessage(
             SEPOLIA_DOMAIN,
             TEST_RECIPIENT,
             identicalMessage
@@ -83,7 +83,7 @@ contract SenderValidation is Test {
             revert("Identical message should be accepted");
         }
     }
-    
+
     function test_tokenMessengerBypassComparison() public {
         uint256 testAmount = 100e6;
         bytes memory bypassMessage = abi.encode(
@@ -91,8 +91,8 @@ contract SenderValidation is Test {
             testAmount,
             TEST_RECIPIENT
         );
-        
-        try testContract.test_sendArbitraryMessage(
+
+        try testContract.sendArbitraryMessage(
             SEPOLIA_DOMAIN,
             TEST_RECIPIENT,
             bypassMessage
@@ -102,11 +102,11 @@ contract SenderValidation is Test {
             revert("Bypass message should be accepted");
         }
     }
-    
+
     function test_senderInformationLogging() public {
         bytes memory testMessage = abi.encode(uint256(999), msg.sender, address(this));
-        
-        try testContract.test_sendArbitraryMessage(
+
+        try testContract.sendArbitraryMessage(
             SEPOLIA_DOMAIN,
             TEST_RECIPIENT,
             testMessage

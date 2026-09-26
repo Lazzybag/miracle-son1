@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 /**
  * @title IMessageTransmitter
- * @dev Interface for Circle's MessageTransmitter contract
+ * @dev Minimal interface used by the local test harness.
  */
 interface IMessageTransmitter {
     function sendMessage(
@@ -17,7 +17,7 @@ interface IMessageTransmitter {
 
 /**
  * @title ITokenMessenger
- * @dev Interface for Circle's TokenMessenger contract
+ * @dev Minimal interface used by the local test harness.
  */
 interface ITokenMessenger {
     function depositForBurn(
@@ -30,10 +30,8 @@ interface ITokenMessenger {
 
 /**
  * @title CCTPDirectMessageTest
- * @dev Test harness for Iris-style cross-chain message validation tests.
- * This contract intentionally keeps the logic local so the Foundry tests can
- * exercise the intended verification behavior without requiring a live CCTP
- * deployment on forked Sepolia.
+ * @dev Local test harness used by Foundry tests. The methods here intentionally
+ * mirror the names the tests expect, but they are not public Foundry fuzz tests.
  */
 contract CCTPDirectMessageTest {
     address public owner;
@@ -71,7 +69,6 @@ contract CCTPDirectMessageTest {
         owner = msg.sender;
         _nextNonce = 1;
 
-        // We do not depend on a live CCTP deployment in tests.
         messageTransmitter = IMessageTransmitter(address(0));
         tokenMessenger = ITokenMessenger(address(0));
         usdc = 0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238;
@@ -83,31 +80,7 @@ contract CCTPDirectMessageTest {
         return nonce;
     }
 
-    function _emitMessageEvents(
-        uint32 destinationDomain,
-        bytes32 recipientAddress,
-        bytes calldata message,
-        string memory messageType
-    ) internal {
-        uint64 nonce = _nextNonceValue();
-
-        emit DirectMessageSent(
-            nonce,
-            destinationDomain,
-            recipientAddress,
-            message,
-            messageType
-        );
-
-        emit MessageStructureLogged(
-            nonce,
-            message.length,
-            keccak256(message),
-            msg.sender
-        );
-    }
-
-    function test_sendArbitraryMessage(
+    function sendArbitraryMessage(
         uint32 destinationDomain,
         bytes32 recipientAddress,
         bytes calldata arbitraryMessage
@@ -134,7 +107,7 @@ contract CCTPDirectMessageTest {
         return nonce;
     }
 
-    function test_sendFakeUSDCDeposit(
+    function sendFakeUSDCDeposit(
         uint32 destinationDomain,
         bytes32 recipientAddress,
         uint256 fakeAmount
@@ -165,7 +138,7 @@ contract CCTPDirectMessageTest {
         return nonce;
     }
 
-    function test_sendMalformedMessage(
+    function sendMalformedMessage(
         uint32 destinationDomain,
         bytes32 recipientAddress
     ) external onlyOwner returns (uint64 nonce) {
@@ -194,7 +167,7 @@ contract CCTPDirectMessageTest {
         return nonce;
     }
 
-    function test_sendNormalDeposit(
+    function sendNormalDeposit(
         uint256 amount,
         uint32 destinationDomain,
         bytes32 mintRecipient
@@ -215,12 +188,12 @@ contract CCTPDirectMessageTest {
         return 0;
     }
 
-    function test_sendVaryingSizeMessages(
+    function sendVaryingSizeMessages(
         uint32 destinationDomain,
         bytes32 recipientAddress,
         uint8 payloadSize
     ) external onlyOwner returns (uint64 nonce) {
-        require(payloadSize > 0 && payloadSize <= 100, "Invalid payload size");
+        require(payloadSize > 0, "Invalid payload size");
 
         bytes memory variableMessage = new bytes(payloadSize);
         for (uint8 i = 0; i < payloadSize; i++) {

@@ -10,22 +10,22 @@ import "../src/CCTPDirectMessageTest.sol";
  */
 contract MessageVerification is Test {
     CCTPDirectMessageTest public testContract;
-    
+
     uint32 constant SEPOLIA_DOMAIN = 0;
     bytes32 constant TEST_RECIPIENT = bytes32(uint256(0x1234567890abcdef));
-    
+
     function setUp() public {
         testContract = new CCTPDirectMessageTest();
     }
-    
+
     function test_arbitraryMessageAcceptance() public {
         bytes memory arbitraryMessage = abi.encodePacked(
             "This is an arbitrary message",
             uint256(12345),
             address(0x1234567890123456789012345678901234567890)
         );
-        
-        try testContract.test_sendArbitraryMessage(
+
+        try testContract.sendArbitraryMessage(
             SEPOLIA_DOMAIN,
             TEST_RECIPIENT,
             arbitraryMessage
@@ -36,9 +36,9 @@ contract MessageVerification is Test {
             revert(string(abi.encodePacked("Arbitrary message rejected: ", reason)));
         }
     }
-    
+
     function test_minimalMessageStructure() public {
-        try testContract.test_sendMalformedMessage(
+        try testContract.sendMalformedMessage(
             SEPOLIA_DOMAIN,
             TEST_RECIPIENT
         ) returns (uint64 nonce) {
@@ -48,11 +48,11 @@ contract MessageVerification is Test {
             console.log("Minimal message rejected:", reason);
         }
     }
-    
+
     function test_emptyMessageRejection() public {
         bytes memory emptyMessage = "";
-        
-        try testContract.test_sendArbitraryMessage(
+
+        try testContract.sendArbitraryMessage(
             SEPOLIA_DOMAIN,
             TEST_RECIPIENT,
             emptyMessage
@@ -62,11 +62,11 @@ contract MessageVerification is Test {
             console.log("Empty message correctly rejected:", reason);
         }
     }
-    
+
     function test_smallMessageAcceptance() public {
         bytes memory smallMessage = abi.encode(uint256(100), "small");
-        
-        try testContract.test_sendArbitraryMessage(
+
+        try testContract.sendArbitraryMessage(
             SEPOLIA_DOMAIN,
             TEST_RECIPIENT,
             smallMessage
@@ -76,14 +76,14 @@ contract MessageVerification is Test {
             revert("Small message should be accepted");
         }
     }
-    
+
     function test_largeMessageHandling() public {
         bytes memory largeMessage = new bytes(1000);
         for (uint i = 0; i < 1000; i++) {
             largeMessage[i] = bytes1(uint8(i % 256));
         }
-        
-        try testContract.test_sendArbitraryMessage(
+
+        try testContract.sendArbitraryMessage(
             SEPOLIA_DOMAIN,
             TEST_RECIPIENT,
             largeMessage
@@ -93,14 +93,14 @@ contract MessageVerification is Test {
             console.log("Large message rejected -", reason);
         }
     }
-    
+
     function test_encodedVsRawMessage() public {
         address testToken = 0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238;
         uint256 testAmount = 1000e6;
-        
+
         bytes memory encodedMessage = abi.encode(testToken, testAmount, TEST_RECIPIENT);
-        
-        try testContract.test_sendArbitraryMessage(
+
+        try testContract.sendArbitraryMessage(
             SEPOLIA_DOMAIN,
             TEST_RECIPIENT,
             encodedMessage
@@ -110,11 +110,11 @@ contract MessageVerification is Test {
             revert("Encoded message should be accepted");
         }
     }
-    
+
     function test_messageStructureLogging() public {
         bytes memory testMessage = abi.encode(uint256(12345), address(0xabcd), "test");
-        
-        try testContract.test_sendArbitraryMessage(
+
+        try testContract.sendArbitraryMessage(
             SEPOLIA_DOMAIN,
             TEST_RECIPIENT,
             testMessage
