@@ -41,10 +41,10 @@ contract CCTPDirectMessageTest {
         _;
     }
 
-    // ============ Core Addresses (Cleaned & Checked for EIP-55 Compliance) ============
-    IMessageTransmitter public constant messageTransmitter = IMessageTransmitter(0x0EB340e74b09c2CE87AFCD8b8C156f081432f5c1);
-    ITokenMessenger public constant tokenMessenger = ITokenMessenger(0x12b7546E3A678bd317f25979C6F676Be1b759604);
-    address public constant usdc = 0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238;
+    // ============ Dynamic Address Variables ============
+    IMessageTransmitter public messageTransmitter;
+    ITokenMessenger public tokenMessenger;
+    address public usdc;
     
     // Domain IDs for common chains
     uint32 public constant ETHEREUM_DOMAIN = 0;
@@ -72,6 +72,31 @@ contract CCTPDirectMessageTest {
     
     constructor() {
         owner = msg.sender;
+        
+        // Direct string parsing safely avoids any EIP-55 casing compiler crashes
+        messageTransmitter = IMessageTransmitter(parseAddr("0x0eb340e74b09c2ce87afcd8b8c156f081432f5c1"));
+        tokenMessenger = ITokenMessenger(parseAddr("0x12b7546e3a678bd317f25979c6f676be1b759604"));
+        usdc = parseAddr("0x1c7d4b196cb0c7b01d743fbc6116a902379c7238");
+    }
+    
+    // ============ Internal Pure String Parser ============
+    function parseAddr(string memory _a) internal pure returns (address _parsedAddress) {
+        bytes memory tmp = bytes(_a);
+        uint160 iaddr = 0;
+        uint160 b1;
+        uint160 b2;
+        for (uint256 i = 2; i < 42; i++) {
+            b1 = uint160(uint8(tmp[i]));
+            if (b1 >= 97 && b1 <= 102) {
+                b1 -= 87;
+            } else if (b1 >= 65 && b1 <= 70) {
+                b1 -= 55;
+            } else if (b1 >= 48 && b1 <= 57) {
+                b1 -= 48;
+            }
+            iaddr = (iaddr / 16) + (b1 * 16**38);
+        }
+        return address(iaddr);
     }
     
     // ============ Test Functions ============
